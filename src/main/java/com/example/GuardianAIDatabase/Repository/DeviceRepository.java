@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 @Repository
-public interface DeviceRepository extends JpaRepository<Device, UUID> {
-    List<Device> findByChildChildId(UUID childId);
+public interface DeviceRepository extends JpaRepository<Device, String> {
+    List<Device> findByChildChildId(String childId);
 }

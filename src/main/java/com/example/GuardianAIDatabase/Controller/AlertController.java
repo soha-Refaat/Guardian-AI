@@ -18,25 +18,25 @@ public class AlertController {
     private final AlertService alertService;
 
     @GetMapping("/parents/{parentId}/alerts")
-    public ResponseEntity<List<Alert>> getByParent(@PathVariable UUID parentId) {
+    public ResponseEntity<List<Alert>> getByParent(@PathVariable String parentId) {
         return ResponseEntity.ok(alertService.getByParent(parentId));
     }
 
     @GetMapping("/alerts/{id}")
-    public ResponseEntity<Alert> getById(@PathVariable UUID id) {
+    public ResponseEntity<Alert> getById(@PathVariable String id) {
         return ResponseEntity.ok(alertService.getById(id));
     }
 
     @PostMapping("/parents/{parentId}/alerts/{detectionId}")
-    public ResponseEntity<Alert> create(@PathVariable UUID parentId,
-                                        @PathVariable UUID detectionId,
+    public ResponseEntity<Alert> create(@PathVariable String parentId,
+                                        @PathVariable String detectionId,
                                         @RequestBody Alert alert) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(alertService.create(parentId, detectionId, alert));
     }
 
     @DeleteMapping("/alerts/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         alertService.delete(id);
         return ResponseEntity.noContent().build();
     }

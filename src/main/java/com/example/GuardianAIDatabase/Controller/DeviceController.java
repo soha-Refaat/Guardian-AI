@@ -18,27 +18,27 @@ public class DeviceController {
     private final DeviceService deviceService;
 
     @GetMapping("/children/{childId}/devices")
-    public ResponseEntity<List<Device>> getByChild(@PathVariable UUID childId) {
+    public ResponseEntity<List<Device>> getByChild(@PathVariable String childId) {
         return ResponseEntity.ok(deviceService.getByChild(childId));
     }
 
     @GetMapping("/devices/{id}")
-    public ResponseEntity<Device> getById(@PathVariable UUID id) {
+    public ResponseEntity<Device> getById(@PathVariable String id) {
         return ResponseEntity.ok(deviceService.getById(id));
     }
 
     @PostMapping("/children/{childId}/devices")
-    public ResponseEntity<Device> create(@PathVariable UUID childId, @RequestBody Device device) {
+    public ResponseEntity<Device> create(@PathVariable String childId, @RequestBody Device device) {
         return ResponseEntity.status(HttpStatus.CREATED).body(deviceService.create(childId, device));
     }
 
     @PutMapping("/devices/{id}")
-    public ResponseEntity<Device> update(@PathVariable UUID id, @RequestBody Device device) {
+    public ResponseEntity<Device> update(@PathVariable String id, @RequestBody Device device) {
         return ResponseEntity.ok(deviceService.update(id, device));
     }
 
     @DeleteMapping("/devices/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         deviceService.delete(id);
         return ResponseEntity.noContent().build();
     }

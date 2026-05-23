@@ -18,23 +18,23 @@ public class ContentLogController {
     private final ContentLogService contentLogService;
 
     @GetMapping("/devices/{deviceId}/logs")
-    public ResponseEntity<List<ContentLog>> getByDevice(@PathVariable UUID deviceId) {
+    public ResponseEntity<List<ContentLog>> getByDevice(@PathVariable String deviceId) {
         return ResponseEntity.ok(contentLogService.getByDevice(deviceId));
     }
 
     @GetMapping("/logs/{id}")
-    public ResponseEntity<ContentLog> getById(@PathVariable UUID id) {
+    public ResponseEntity<ContentLog> getById(@PathVariable String id) {
         return ResponseEntity.ok(contentLogService.getById(id));
     }
 
     @PostMapping("/devices/{deviceId}/logs")
-    public ResponseEntity<ContentLog> create(@PathVariable UUID deviceId,
+    public ResponseEntity<ContentLog> create(@PathVariable String deviceId,
                                              @RequestBody ContentLog log) {
         return ResponseEntity.status(HttpStatus.CREATED).body(contentLogService.create(deviceId, log));
     }
 
     @DeleteMapping("/logs/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         contentLogService.delete(id);
         return ResponseEntity.noContent().build();
     }

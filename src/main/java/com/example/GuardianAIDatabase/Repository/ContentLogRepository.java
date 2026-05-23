@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface ContentLogRepository extends JpaRepository<ContentLog, UUID> {
-    List<ContentLog> findByDeviceDeviceId(UUID deviceId);
+public interface ContentLogRepository extends JpaRepository<ContentLog, String> {
+    List<ContentLog> findByDeviceDeviceId(String deviceId);
 }

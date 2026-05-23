@@ -17,17 +17,17 @@ public class AiDetectionController {
     private final AiDetectionService aiDetectionService;
 
     @GetMapping("/logs/{logId}/detection")
-    public ResponseEntity<AiDetection> getByLog(@PathVariable UUID logId) {
+    public ResponseEntity<AiDetection> getByLog(@PathVariable String logId) {
         return ResponseEntity.ok(aiDetectionService.getByLog(logId));
     }
 
     @GetMapping("/detections/{id}")
-    public ResponseEntity<AiDetection> getById(@PathVariable UUID id) {
+    public ResponseEntity<AiDetection> getById(@PathVariable String id) {
         return ResponseEntity.ok(aiDetectionService.getById(id));
     }
 
     @PostMapping("/logs/{logId}/detection")
-    public ResponseEntity<AiDetection> create(@PathVariable UUID logId,
+    public ResponseEntity<AiDetection> create(@PathVariable String logId,
                                               @RequestBody AiDetection detection) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(aiDetectionService.create(logId, detection));

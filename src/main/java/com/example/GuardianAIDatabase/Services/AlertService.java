@@ -20,13 +20,13 @@ public class AlertService {
     private final ParentRepository parentRepository;
     private final AiDetectionRepository aiDetectionRepository;
 
-    public List<Alert>getByParent(UUID parentId){
+    public List<Alert>getByParent(String parentId){
         return alertRepository.findByParentParentId(parentId);
     }
-    public Alert getById(UUID id){
+    public Alert getById(String id){
         return alertRepository.findById(id).orElseThrow(()->new RuntimeException("Alert not found"));
     }
-    public Alert create(UUID parentId, UUID detectId, Alert alert){
+    public Alert create(String parentId, String detectId, Alert alert){
         Parent parent = parentRepository.findById(parentId)
                 .orElseThrow(()->new RuntimeException("Parent not found"));
         AiDetection detection = aiDetectionRepository.findById(detectId)
@@ -36,7 +36,7 @@ public class AlertService {
         alert.setSendAt(LocalDateTime.now());
         return alertRepository.save(alert);
     }
-    public void delete(UUID id) {
+    public void delete(String id) {
         alertRepository.deleteById(id);
     }
 

@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
 @Repository
-public interface PreferenceRepository extends JpaRepository<Preference, UUID> {
-    Optional<Preference> findByChildChildId(UUID childId);
+public interface PreferenceRepository extends JpaRepository<Preference, String> {
+    Optional<Preference> findByChildChildId(String childId);
 }

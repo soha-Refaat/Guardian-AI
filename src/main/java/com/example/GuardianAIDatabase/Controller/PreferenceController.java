@@ -16,12 +16,12 @@ public class PreferenceController {
     private final PreferenceService preferenceService;
 
     @GetMapping("/children/{childId}/preference")
-    public ResponseEntity<Preference> getByChild(@PathVariable UUID childId) {
+    public ResponseEntity<Preference> getByChild(@PathVariable String childId) {
         return ResponseEntity.ok(preferenceService.getByChild(childId));
     }
 
     @PutMapping("/children/{childId}/preference")
-    public ResponseEntity<Preference> createOrUpdate(@PathVariable UUID childId,
+    public ResponseEntity<Preference> createOrUpdate(@PathVariable String childId,
                                                      @RequestBody Preference preference) {
         return ResponseEntity.ok(preferenceService.createOrUpdate(childId, preference));
     }

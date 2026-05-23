@@ -17,12 +17,12 @@ public class PreferenceService {
     private final PreferenceRepository preferenceRepository;
     private final ChildRepository childRepository;
 
-    public Preference getByChild(UUID childId) {
+    public Preference getByChild(String childId) {
         return preferenceRepository.findByChildChildId(childId)
                 .orElseThrow(() -> new RuntimeException("Preference not found"));
     }
 
-    public Preference createOrUpdate(UUID childId, Preference preference) {
+    public Preference createOrUpdate(String childId, Preference preference) {
         Child child = childRepository.findById(childId)
                 .orElseThrow(() -> new RuntimeException("Child not found"));
 

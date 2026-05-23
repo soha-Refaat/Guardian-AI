@@ -18,8 +18,8 @@ public class Report {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "VARCHAR(36)")
-    private UUID reportId;
+    @Column(length = 36)
+    private String reportId;
 
     @ManyToOne
     @JoinColumn(name = "parent_id")

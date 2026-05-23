@@ -16,21 +16,21 @@ public class ParentService {
     public List<Parent>getAll(){
         return parentRepository.findAll();
     }
-    public Parent getById(UUID id){
+    public Parent getById(String id){
         return parentRepository.findById(id).orElseThrow(() -> new RuntimeException("Parent not found"));
     }
     public Parent create(Parent parent){
         parent.setCreatedAt(LocalDateTime.now());
         return parentRepository.save(parent);
     }
-    public Parent update(UUID id,Parent parent){
+    public Parent update(String id,Parent parent){
         Parent existing = getById(id);
         existing.setName(parent.getName());
         existing.setEmail(parent.getEmail());
         existing.setPhoneNumber(parent.getPhoneNumber());
         return parentRepository.save(existing);
     }
-    public void delete(UUID id){
+    public void delete(String id){
         parentRepository.deleteById(id);
     }
 

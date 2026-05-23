@@ -15,8 +15,8 @@ import java.util.UUID;
 public class Child {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "VARCHAR(36)")
-    private UUID childId;
+    @Column(length = 36)
+    private String childId;
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private Parent parent;

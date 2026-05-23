@@ -18,23 +18,23 @@ public class ReportController {
     private final ReportService reportService;
 
     @GetMapping("/parents/{parentId}/reports")
-    public ResponseEntity<List<Report>> getByParent(@PathVariable UUID parentId) {
+    public ResponseEntity<List<Report>> getByParent(@PathVariable String parentId) {
         return ResponseEntity.ok(reportService.getByParent(parentId));
     }
 
     @GetMapping("/children/{childId}/reports")
-    public ResponseEntity<List<Report>> getByChild(@PathVariable UUID childId) {
+    public ResponseEntity<List<Report>> getByChild(@PathVariable String childId) {
         return ResponseEntity.ok(reportService.getByChild(childId));
     }
 
     @GetMapping("/reports/{id}")
-    public ResponseEntity<Report> getById(@PathVariable UUID id) {
+    public ResponseEntity<Report> getById(@PathVariable String id) {
         return ResponseEntity.ok(reportService.getById(id));
     }
 
     @PostMapping("/parents/{parentId}/children/{childId}/reports")
-    public ResponseEntity<Report> create(@PathVariable UUID parentId,
-                                         @PathVariable UUID childId,
+    public ResponseEntity<Report> create(@PathVariable String parentId,
+                                         @PathVariable String childId,
                                          @RequestBody Report report) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(reportService.create(parentId, childId, report));

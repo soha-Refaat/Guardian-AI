@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface ChildRepository extends JpaRepository<Child, UUID> {
-    List<Child> findByParentParentId(UUID parentId);
+public interface ChildRepository extends JpaRepository<Child, String> {
+    List<Child> findByParentParentId(String parentId);
 }

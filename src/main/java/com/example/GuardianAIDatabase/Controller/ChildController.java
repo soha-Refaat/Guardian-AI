@@ -17,23 +17,23 @@ public class ChildController {
     private final ChildService childService;
 
     @GetMapping("/parents/{parentId}/children")
-    public ResponseEntity<List<Child>>getByParent(@PathVariable UUID parentId){
+    public ResponseEntity<List<Child>>getByParent(@PathVariable String parentId){
         return ResponseEntity.ok(childService.getByParent(parentId));
     }
     @GetMapping("/children/{id}")
-    public ResponseEntity<Child>getById(@PathVariable UUID id){
+    public ResponseEntity<Child>getById(@PathVariable String id){
         return ResponseEntity.ok(childService.getById(id));
     }
     @PostMapping("/parents/{parentId}/children")
-    public ResponseEntity<Child>create(@PathVariable UUID parentId, @RequestBody Child child){
+    public ResponseEntity<Child>create(@PathVariable String parentId, @RequestBody Child child){
         return ResponseEntity.status(HttpStatus.CREATED).body(childService.create(parentId,child));
     }
     @PutMapping("/children/{id}")
-    public ResponseEntity<Child> update(@PathVariable UUID id, @RequestBody Child child) {
+    public ResponseEntity<Child> update(@PathVariable String id, @RequestBody Child child) {
         return ResponseEntity.ok(childService.update(id, child));
     }
     @DeleteMapping("/children/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         childService.delete(id);
         return ResponseEntity.noContent().build();
     }

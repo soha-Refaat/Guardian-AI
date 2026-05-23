@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 @Repository
-public interface AlertRepository extends JpaRepository<Alert, UUID> {
-    List<Alert> findByParentParentId(UUID parentId);
+public interface AlertRepository extends JpaRepository<Alert, String> {
+    List<Alert> findByParentParentId(String parentId);
 }

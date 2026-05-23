@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 @Repository
-public interface SuggestionCardRepository extends JpaRepository<SuggestionCard, UUID> {
-    List<SuggestionCard> findByChildChildId(UUID childId);
+public interface SuggestionCardRepository extends JpaRepository<SuggestionCard, String> {
+    List<SuggestionCard> findByChildChildId(String childId);
 }

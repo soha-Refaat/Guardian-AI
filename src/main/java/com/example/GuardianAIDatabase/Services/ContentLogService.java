@@ -16,20 +16,20 @@ import java.util.UUID;
 public class ContentLogService {
     private final ContentLogRepository contentLogRepository;
     private final DeviceRepository deviceRepository;
-    public List<ContentLog>getByDevice(UUID deviceId){
+    public List<ContentLog>getByDevice(String deviceId){
         return contentLogRepository.findByDeviceDeviceId(deviceId);
 
     }
-    public ContentLog getById(UUID id){
+    public ContentLog getById(String id){
         return contentLogRepository.findById(id).orElseThrow(()->new RuntimeException("Content Log not found"));
     }
-    public ContentLog create(UUID deviceId, ContentLog contentLog){
+    public ContentLog create(String deviceId, ContentLog contentLog){
         Device device = deviceRepository.findById(deviceId).orElseThrow(()->new RuntimeException("Device not found"));
         contentLog.setDevice(device);
         contentLog.setTimestream(LocalDateTime.now());
         return contentLogRepository.save(contentLog);
     }
-    public void delete(UUID id){
+    public void delete(String id){
         contentLogRepository.deleteById(id);
     }
 

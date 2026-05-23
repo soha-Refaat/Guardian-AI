@@ -19,16 +19,16 @@ public class SuggestionCardService {
     private final SuggestionCardRepository suggestionCardRepository;
     private final ChildRepository childRepository;
 
-    public List<SuggestionCard> getByChild(UUID childId) {
+    public List<SuggestionCard> getByChild(String childId) {
         return suggestionCardRepository.findByChildChildId(childId);
     }
 
-    public SuggestionCard getById(UUID id) {
+    public SuggestionCard getById(String id) {
         return suggestionCardRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("SuggestionCard not found"));
     }
 
-    public SuggestionCard create(UUID childId, SuggestionCard card) {
+    public SuggestionCard create(String childId, SuggestionCard card) {
         Child child = childRepository.findById(childId)
                 .orElseThrow(() -> new RuntimeException("Child not found"));
         card.setChild(child);
@@ -36,7 +36,7 @@ public class SuggestionCardService {
         return suggestionCardRepository.save(card);
     }
 
-    public void delete(UUID id) {
+    public void delete(String id) {
         suggestionCardRepository.deleteById(id);
     }
 }

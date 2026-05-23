@@ -15,8 +15,8 @@ import java.util.UUID;
 public class ContentLog {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "VARCHAR(36)")
-    private UUID contentId;
+    @Column(length = 36)
+    private String contentId;
     @ManyToOne
     @JoinColumn(name="device_id")
     @JsonIgnore

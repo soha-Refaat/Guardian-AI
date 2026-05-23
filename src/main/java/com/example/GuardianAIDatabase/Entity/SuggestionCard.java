@@ -16,8 +16,8 @@ public class SuggestionCard {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "VARCHAR(36)")
-    private UUID suggestionId;
+    @Column(length = 36)
+    private String suggestionId;
 
     @ManyToOne
     @JoinColumn(name = "child_id")

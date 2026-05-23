@@ -16,8 +16,8 @@ import java.util.UUID;
 public class Preference {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "VARCHAR(36)")
-    private UUID preferenceId;
+    @Column(length = 36)
+    private String preferenceId;
     @OneToOne
     @JoinColumn(name="child_id")
     @JsonIgnore

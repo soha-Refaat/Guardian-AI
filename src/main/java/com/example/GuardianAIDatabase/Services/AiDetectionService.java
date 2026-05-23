@@ -14,15 +14,15 @@ import java.util.UUID;
 public class AiDetectionService {
     private final AiDetectionRepository aiDetectionRepository;
     private final ContentLogRepository contentLogRepository;
-    public AiDetection getByLog(UUID logId){
+    public AiDetection getByLog(String logId){
         return aiDetectionRepository.findByContentLogContentId(logId)
                 .orElseThrow(() -> new RuntimeException("Detection not found"));
     }
-    public AiDetection getById(UUID id) {
+    public AiDetection getById(String id) {
         return aiDetectionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Detection not found"));
     }
-    public AiDetection create(UUID logId, AiDetection detection) {
+    public AiDetection create(String logId, AiDetection detection) {
         ContentLog log = contentLogRepository.findById(logId)
                 .orElseThrow(() -> new RuntimeException("ContentLog not found"));
         detection.setContentLog(log);

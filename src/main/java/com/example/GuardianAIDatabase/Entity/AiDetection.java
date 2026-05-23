@@ -5,6 +5,7 @@ import com.example.GuardianAIDatabase.enums.Category;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.util.UUID;
@@ -15,8 +16,8 @@ import java.util.UUID;
 public class AiDetection {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "VARCHAR(36)")
-    private UUID detectionId;
+    @Column(length = 36)
+    private String detectionId;
 
     @OneToOne
     @JoinColumn(name = "log_id")

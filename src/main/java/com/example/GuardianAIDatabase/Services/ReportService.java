@@ -21,20 +21,20 @@ public class ReportService {
     private final ParentRepository parentRepository;
     private final ChildRepository childRepository;
 
-    public List<Report> getByParent(UUID parentId) {
+    public List<Report> getByParent(String parentId) {
         return reportRepository.findByParentParentId(parentId);
     }
 
-    public List<Report> getByChild(UUID childId) {
+    public List<Report> getByChild(String childId) {
         return reportRepository.findByChildChildId(childId);
     }
 
-    public Report getById(UUID id) {
+    public Report getById(String id) {
         return reportRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Report not found"));
     }
 
-    public Report create(UUID parentId, UUID childId, Report report) {
+    public Report create(String parentId, String childId, Report report) {
         Parent parent = parentRepository.findById(parentId)
                 .orElseThrow(() -> new RuntimeException("Parent not found"));
         Child child = childRepository.findById(childId)

@@ -16,19 +16,19 @@ import java.util.UUID;
 public class DeviceService {
     private final DeviceRepository deviceRepository;
     private final ChildRepository childRepository;
-    public List<Device>getByChild(UUID childId){
+    public List<Device>getByChild(String childId){
         return deviceRepository.findByChildChildId(childId);
     }
-    public Device getById(UUID id){
+    public Device getById(String id){
         return deviceRepository.findById(id).orElseThrow(()->new RuntimeException("Device not found"));
     }
-    public Device create(UUID childId, Device device){
+    public Device create(String childId, Device device){
         Child child = childRepository.findById(childId).orElseThrow(()->new RuntimeException("Child not found"));
         device.setChild(child);
         device.setLastSeen(LocalDateTime.now());
         return deviceRepository.save(device);
     }
-    public Device update(UUID id, Device device){
+    public Device update(String id, Device device){
         Device existing = getById(id);
         existing.setDeviceName(device.getDeviceName());
         existing.setDeviceVersion(device.getDeviceVersion());
@@ -36,7 +36,7 @@ public class DeviceService {
         existing.setLastSeen(LocalDateTime.now());
         return deviceRepository.save(existing);
     }
-    public void delete(UUID id){
+    public void delete(String id){
         deviceRepository.deleteById(id);
     }
 

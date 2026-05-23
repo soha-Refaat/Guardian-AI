@@ -20,7 +20,7 @@ public class ParentController {
         return ResponseEntity.ok(parentService.getAll());
     }
     @GetMapping("/{id}")
-    public ResponseEntity<Parent>getById(@PathVariable UUID id){
+    public ResponseEntity<Parent>getById(@PathVariable String id){
         return ResponseEntity.ok(parentService.getById(id));
     }
     @PostMapping
@@ -28,11 +28,11 @@ public class ParentController {
         return ResponseEntity.status(HttpStatus.CREATED).body(parentService.create(parent));
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Parent>update(@PathVariable UUID id, @RequestBody Parent parent){
+    public ResponseEntity<Parent>update(@PathVariable String id, @RequestBody Parent parent){
         return ResponseEntity.ok(parentService.update(id,parent));
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void>delete(@PathVariable UUID id){
+    public ResponseEntity<Void>delete(@PathVariable String id){
         parentService.delete(id);
         return ResponseEntity.noContent().build();
     }
