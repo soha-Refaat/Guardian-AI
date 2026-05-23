@@ -17,7 +17,7 @@ import java.util.UUID;
 public class Parent implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(columnDefinition = "CHAR(36)")
+    @Column(columnDefinition = "VARCHAR(36)")
     private UUID parentId;
     private String name;
     @Column(unique = true)

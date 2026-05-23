@@ -18,6 +18,7 @@ public class Report {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(columnDefinition = "VARCHAR(36)")
     private UUID reportId;
 
     @ManyToOne

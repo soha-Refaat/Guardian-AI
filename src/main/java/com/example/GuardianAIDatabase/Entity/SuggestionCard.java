@@ -16,6 +16,7 @@ public class SuggestionCard {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(columnDefinition = "VARCHAR(36)")
     private UUID suggestionId;
 
     @ManyToOne

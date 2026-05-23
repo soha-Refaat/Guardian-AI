@@ -14,6 +14,7 @@ import java.util.UUID;
 public class Device {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(columnDefinition = "VARCHAR(36)")
     private UUID deviceId;
     @ManyToOne
     @JoinColumn(name="child_id")
