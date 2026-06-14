@@ -32,7 +32,7 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // 🔥 خلي كل الـ endpoints مفتوحة مؤقتًا (لحل 403)
+                        //  مفتوحة مؤقتًا (لحل 403)
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session
