@@ -6,6 +6,7 @@ import com.example.GuardianAIDatabase.DTOs.VerifyPairingResponse;
 import com.example.GuardianAIDatabase.Entity.Child;
 import com.example.GuardianAIDatabase.Entity.Device;
 import com.example.GuardianAIDatabase.Entity.PairingCode;
+import com.example.GuardianAIDatabase.Entity.Parent;
 import com.example.GuardianAIDatabase.Repository.ChildRepository;
 import com.example.GuardianAIDatabase.Repository.DeviceRepository;
 import com.example.GuardianAIDatabase.Repository.PairingCodeRepository;
@@ -21,6 +22,7 @@ public class PairingService {
     private final PairingCodeRepository pairingCodeRepository;
     private final ChildRepository childRepository;
     private final DeviceRepository deviceRepository;
+    private final JwtService jwtService;
     public GeneratePairingResponse generateCode(String childId){
         Child child = childRepository.findById(childId).orElseThrow(
                 ()-> new RuntimeException("Child Not Found")
@@ -44,6 +46,7 @@ public class PairingService {
             throw new RuntimeException("Code has expired");
         }
         Child child = pairingCode.getChild();
+        Parent parent = child.getParent();
 
         Device device = new Device();
         device.setChild(child);
@@ -55,10 +58,15 @@ public class PairingService {
 
         pairingCode.setUsed(true);
         pairingCodeRepository.save(pairingCode);
+
+        String authToken = jwtService.generateToken(parent.getEmail());
+
         return new VerifyPairingResponse(
                 child.getChildId(),
                 child.getName(),
                 device.getDeviceId(),
+                parent.getParentId(),
+                authToken,
                 "Device paired successfully"
         );
     }

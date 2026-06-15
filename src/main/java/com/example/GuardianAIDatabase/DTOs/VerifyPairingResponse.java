@@ -9,5 +9,7 @@ public class VerifyPairingResponse {
     private String childId;
     private String childName;
     private String deviceId;
+    private String authToken;
+    private String parentId;
     private String message;
 }

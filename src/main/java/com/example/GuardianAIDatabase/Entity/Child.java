@@ -19,6 +19,7 @@ public class Child {
     private String childId;
     @ManyToOne
     @JoinColumn(name = "parent_id")
+    @JsonIgnore
     private Parent parent;
     private String name;
     private int age;
