@@ -65,8 +65,8 @@ public class PairingService {
                 child.getChildId(),
                 child.getName(),
                 device.getDeviceId(),
-                parent.getParentId(),
                 authToken,
+                parent.getParentId(),
                 "Device paired successfully"
         );
     }
