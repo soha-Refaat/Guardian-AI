@@ -31,5 +31,9 @@ public class Child {
 
     @OneToOne(mappedBy = "child", cascade = CascadeType.ALL)
     @JsonIgnore
-    private Preference preference;
+    private ContentFilter contentFilter;
+
+    @OneToMany(mappedBy = "child", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<MonitoredApp> monitoredApps = new ArrayList<>();
 }
