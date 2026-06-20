@@ -28,24 +28,16 @@ public class ContentFilter {
 
     // ---- Violence ----
     @Enumerated(EnumType.STRING)
-    private FilterLevel violenceLevel;          // LOW, MEDIUM, HIGH
-
-    @Enumerated(EnumType.STRING)
-    private FilterAction violenceAction;        // FLAG_ONLY, BLUR, BLOCK
+    private FilterLevel violence;
 
     // ---- Nudity ----
     @Enumerated(EnumType.STRING)
-    private FilterLevel nudityLevel;
+    private FilterLevel nudity;
 
-    @Enumerated(EnumType.STRING)
-    private FilterAction nudityAction;
 
     // ---- Offensive Words ----
     @Enumerated(EnumType.STRING)
-    private FilterLevel offensiveWordsLevel;
-
-    @Enumerated(EnumType.STRING)
-    private FilterAction offensiveWordsAction;
+    private FilterLevel offensiveWords;
 
     private LocalDateTime updatedAt;
 }

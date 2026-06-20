@@ -31,14 +31,11 @@ public class ContentFilterService {
 
         existing.setChild(child);
 
-        existing.setViolenceLevel(incoming.getViolenceLevel());
-        existing.setViolenceAction(incoming.getViolenceAction());
+        existing.setViolence(incoming.getViolence());
 
-        existing.setNudityLevel(incoming.getNudityLevel());
-        existing.setNudityAction(incoming.getNudityAction());
+        existing.setNudity(incoming.getNudity());
 
-        existing.setOffensiveWordsLevel(incoming.getOffensiveWordsLevel());
-        existing.setOffensiveWordsAction(incoming.getOffensiveWordsAction());
+        existing.setOffensiveWords(incoming.getOffensiveWords());
 
         existing.setUpdatedAt(LocalDateTime.now());
 
