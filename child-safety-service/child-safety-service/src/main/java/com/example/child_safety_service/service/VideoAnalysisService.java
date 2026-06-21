@@ -5,7 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -13,29 +13,31 @@ import java.io.File;
 @Service
 public class VideoAnalysisService {
 
-    private final RestClient restClient;
+    private final WebClient pythonServiceWebClient;
 
-    public VideoAnalysisService(RestClient restClient) {
-        this.restClient = restClient;
+    public VideoAnalysisService(WebClient pythonServiceWebClient) {
+        this.pythonServiceWebClient = pythonServiceWebClient;
     }
 
     public Object analyzeVideo(MultipartFile file) throws Exception {
 
-        File tempFile = File.createTempFile("video", ".mp4");
-        file.transferTo(tempFile);
+        File temp = File.createTempFile("video", ".mp4");
+        try {
+            file.transferTo(temp);
 
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("file", new FileSystemResource(tempFile));
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", new FileSystemResource(temp));
 
-        Object response = restClient.post()
-                .uri("http://localhost:5000/predict-video")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(body)
-                .retrieve()
-                .body(Object.class);
+            return pythonServiceWebClient.post()
+                    .uri("/predict-video")
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .bodyValue(body)
+                    .retrieve()
+                    .bodyToMono(Object.class)
+                    .block();
 
-        tempFile.delete();
-
-        return response;
+        } finally {
+            temp.delete();
+        }
     }
 }

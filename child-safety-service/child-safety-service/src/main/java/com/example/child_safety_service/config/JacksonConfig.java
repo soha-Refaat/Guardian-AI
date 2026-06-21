@@ -1,14 +1,14 @@
 package com.example.child_safety_service.config;
 
+import tools.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestClient;
 
 @Configuration
-public class RestClientConfig {
+public class JacksonConfig {
 
     @Bean
-    public RestClient restClient() {
-        return RestClient.create();
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 }

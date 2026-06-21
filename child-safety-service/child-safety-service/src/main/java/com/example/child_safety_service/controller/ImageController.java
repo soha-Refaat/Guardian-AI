@@ -2,8 +2,9 @@ package com.example.child_safety_service.controller;
 
 import com.example.child_safety_service.dto.AnalysisResponse;
 import com.example.child_safety_service.dto.ImageRequest;
-import com.example.child_safety_service.service.ImageAnalysisService;
 import org.springframework.http.ResponseEntity;
+import com.example.child_safety_service.service.ImageAnalysisService;  // ← ده الناقص
+
 import org.springframework.web.bind.annotation.*;
 
 @RestController

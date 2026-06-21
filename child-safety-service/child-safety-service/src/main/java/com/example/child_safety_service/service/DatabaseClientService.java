@@ -1,12 +1,11 @@
 package com.example.child_safety_service.service;
 
-import com.example.child_safety_service.dto.DetectionResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
+import com.example.child_safety_service.dto.DetectionResult;
 import java.util.Map;
 
 @Service

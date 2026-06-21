@@ -38,7 +38,8 @@ def decode_image(base64_str):
         return None, str(e)
 # ================= CORE PREDICTION =================
 def predict_image(frame):
-    results = model.predict(frame, verbose=False)
+    results = model.predict(frame, verbose=False, conf=CONF_THRESHOLD)
+
     boxes = results[0].boxes
     detections = []
     if boxes is not None and len(boxes) > 0:
