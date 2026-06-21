@@ -1,53 +1,69 @@
 package com.example.Nudity_Detection_Service.service;
 
-
-import com.example.Nudity_Detection_Service.MultipartInputStreamFileResource;
 import com.example.Nudity_Detection_Service.dto.AnalysisResponse;
-import org.springframework.http.*;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.*;
+
+import java.util.Base64;
+import java.util.Map;
 
 @Service
 public class NudityAnalysisService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    private final String IMAGE_URL = "http://localhost:6000/predict-nudity";
-    private final String VIDEO_URL = "http://localhost:6000/predict-nudity-video";
+    private final String ANALYZE_URL = "http://localhost:6001/analyze";
+    private final String VIDEO_URL   = "http://localhost:6001/analyze-video";
 
     // ================= IMAGE =================
     public AnalysisResponse analyzeImage(String base64) {
 
+        // تحويل base64 لـ raw bytes وبعتها كـ octet-stream
+        byte[] imageBytes = Base64.getDecoder().decode(
+                base64.contains(",") ? base64.split(",")[1] : base64
+        );
+
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 
-        String body = "{\"image\":\"" + base64 + "\"}";
+        HttpEntity<byte[]> request = new HttpEntity<>(imageBytes, headers);
 
-        HttpEntity<String> request = new HttpEntity<>(body, headers);
+        ResponseEntity<Map> response =
+                restTemplate.postForEntity(ANALYZE_URL, request, Map.class);
 
-        ResponseEntity<AnalysisResponse> response =
-                restTemplate.postForEntity(IMAGE_URL, request, AnalysisResponse.class);
+        Map body = response.getBody();
+        if (body == null) {
+            return new AnalysisResponse(true, "NONE", 0.0);
+        }
 
-        return response.getBody();
+        boolean detected  = Boolean.parseBoolean(body.get("detected").toString());
+        String  category  = body.get("category").toString();
+        double  confidence = Double.parseDouble(body.get("confidence").toString());
+
+        // نحول النتيجة لـ AnalysisResponse
+        // is_safe = !detected
+        return new AnalysisResponse(!detected, category, confidence);
     }
 
     // ================= VIDEO =================
-    public Object analyzeVideo(MultipartFile file) throws Exception {
+    public Object analyzeVideo(org.springframework.web.multipart.MultipartFile file) throws Exception {
 
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        com.example.Nudity_Detection_Service.MultipartInputStreamFileResource resource =
+                new com.example.Nudity_Detection_Service.MultipartInputStreamFileResource(
+                        file.getInputStream(),
+                        file.getOriginalFilename()
+                );
 
-        body.add("file", new MultipartInputStreamFileResource(
-                file.getInputStream(),
-                file.getOriginalFilename()
-        ));
+        org.springframework.util.MultiValueMap<String, Object> body =
+                new org.springframework.util.LinkedMultiValueMap<>();
+        body.add("file", resource);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
-        HttpEntity<MultiValueMap<String, Object>> request =
+        HttpEntity<org.springframework.util.MultiValueMap<String, Object>> request =
                 new HttpEntity<>(body, headers);
 
         return restTemplate.postForObject(VIDEO_URL, request, Object.class);
