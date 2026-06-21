@@ -2,15 +2,22 @@ package com.example.Nudity_Detection_Service;
 
 import org.springframework.core.io.InputStreamResource;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 public class MultipartInputStreamFileResource extends InputStreamResource {
 
     private final String filename;
 
-    public MultipartInputStreamFileResource(InputStream inputStream, String filename) {
+    public MultipartInputStreamFileResource(
+            InputStream inputStream,
+            String filename
+    ) {
         super(inputStream);
-        this.filename = filename;
+
+        this.filename = filename != null
+                ? filename
+                : "video.mp4";
     }
 
     @Override
@@ -19,7 +26,9 @@ public class MultipartInputStreamFileResource extends InputStreamResource {
     }
 
     @Override
-    public long contentLength() {
+    public long contentLength() throws IOException {
+
+        // مهم جداً عشان Spring ميحاولش يقرأ الـ stream مرتين
         return -1;
     }
 }
