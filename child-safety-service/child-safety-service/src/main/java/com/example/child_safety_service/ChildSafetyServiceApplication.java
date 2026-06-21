@@ -6,7 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class ChildSafetyServiceApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(ChildSafetyServiceApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(ChildSafetyServiceApplication.class, args);
+	}
+
 }

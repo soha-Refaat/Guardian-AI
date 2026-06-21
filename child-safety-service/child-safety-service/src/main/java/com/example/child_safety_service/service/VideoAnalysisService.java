@@ -5,7 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -13,31 +13,29 @@ import java.io.File;
 @Service
 public class VideoAnalysisService {
 
-    private final WebClient pythonServiceWebClient;
+    private final RestClient restClient;
 
-    public VideoAnalysisService(WebClient pythonServiceWebClient) {
-        this.pythonServiceWebClient = pythonServiceWebClient;
+    public VideoAnalysisService(RestClient restClient) {
+        this.restClient = restClient;
     }
 
     public Object analyzeVideo(MultipartFile file) throws Exception {
 
-        File temp = File.createTempFile("video", ".mp4");
-        try {
-            file.transferTo(temp);
+        File tempFile = File.createTempFile("video", ".mp4");
+        file.transferTo(tempFile);
 
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("file", new FileSystemResource(temp));
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", new FileSystemResource(tempFile));
 
-            return pythonServiceWebClient.post()
-                    .uri("/predict-video")
-                    .contentType(MediaType.MULTIPART_FORM_DATA)
-                    .bodyValue(body)
-                    .retrieve()
-                    .bodyToMono(Object.class)
-                    .block(); // blocking عشان الـ controller مش reactive
+        Object response = restClient.post()
+                .uri("http://localhost:5000/predict-video")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(body)
+                .retrieve()
+                .body(Object.class);
 
-        } finally {
-            temp.delete();
-        }
+        tempFile.delete();
+
+        return response;
     }
 }

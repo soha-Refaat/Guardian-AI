@@ -1,31 +1,38 @@
 package com.example.child_safety_service.dto;
 
-import java.util.List;
-import java.util.Map;
-
 public class AnalysisResponse {
 
-    private List<Map<String, Object>> detections;
-    private int totalBoxes;
+    private boolean isSafe;
+    private String reason;
+    private double confidence;
 
-    public AnalysisResponse(List<Map<String, Object>> detections, int totalBoxes) {
-        this.detections = detections;
-        this.totalBoxes = totalBoxes;
+    public AnalysisResponse(boolean isSafe, String reason, double confidence) {
+        this.isSafe = isSafe;
+        this.reason = reason;
+        this.confidence = confidence;
     }
 
-    public List<Map<String, Object>> getDetections() {
-        return detections;
+    public boolean isSafe() {
+        return isSafe;
     }
 
-    public void setDetections(List<Map<String, Object>> detections) {
-        this.detections = detections;
+    public void setSafe(boolean safe) {
+        isSafe = safe;
     }
 
-    public int getTotalBoxes() {
-        return totalBoxes;
+    public String getReason() {
+        return reason;
     }
 
-    public void setTotalBoxes(int totalBoxes) {
-        this.totalBoxes = totalBoxes;
+    public void setReason(String reason) {
+        this.reason = reason;
+    }
+
+    public double getConfidence() {
+        return confidence;
+    }
+
+    public void setConfidence(double confidence) {
+        this.confidence = confidence;
     }
 }

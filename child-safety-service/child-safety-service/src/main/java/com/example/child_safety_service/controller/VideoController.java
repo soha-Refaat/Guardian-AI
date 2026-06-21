@@ -18,6 +18,7 @@ public class VideoController {
     @PostMapping("/analyze")
     public ResponseEntity<?> analyzeVideo(@RequestParam("file") MultipartFile file) {
 
+        // 🔥 LOG هنا
         System.out.println("===== VIDEO CONTROLLER HIT =====");
         System.out.println("FILE: " + file);
         System.out.println("FILENAME: " + (file != null ? file.getOriginalFilename() : "NULL"));
@@ -28,9 +29,7 @@ public class VideoController {
         }
 
         try {
-            // 🔥 بيرجع frames detections
             return ResponseEntity.ok(service.analyzeVideo(file));
-
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
