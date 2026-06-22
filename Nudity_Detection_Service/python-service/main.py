@@ -125,7 +125,6 @@ async def analyze(request: Request):
                 detected = True
                 confidence = min(ratio * 2, 1.0)
 
-                # ابعتي الـ bounding boxes للمناطق الكبيرة بس
                 for area, x, y, bw, bh in significant_contours:
                     bounding_boxes.append({
                         "x": x,
