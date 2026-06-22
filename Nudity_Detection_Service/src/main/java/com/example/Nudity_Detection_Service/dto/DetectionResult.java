@@ -15,11 +15,10 @@ public class DetectionResult {
     private boolean detected;
     private String category;
     private float confidence;
-    private String action;
     private String contentType;
     private List<BoundingBox> boundingBoxes;
 
     public static DetectionResult safe() {
-        return new DetectionResult(false, "NONE", 0f, "ALLOWED", "IMAGE", new ArrayList<>());
+        return new DetectionResult(false, "NONE", 0f, "IMAGE", new ArrayList<>());
     }
 }
