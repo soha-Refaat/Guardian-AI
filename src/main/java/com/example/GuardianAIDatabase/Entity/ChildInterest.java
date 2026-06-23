@@ -2,29 +2,29 @@ package com.example.GuardianAIDatabase.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.UuidGenerator;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SuggestionCard {
+public class ChildInterest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(length = 36)
-    private String suggestionId;
+    private String interestId;
 
     @ManyToOne
     @JoinColumn(name = "child_id")
     @JsonIgnore
     private Child child;
 
-    private String triggerCategory;
-    private String suggestionText;
-    private LocalDateTime createdAt;
+    private String category;      // نفس الـ category من DefaultSuggestion أو custom
+    private Boolean isCustom;     // false = من الجاهزة، true = custom
+    private LocalDateTime addedAt;
 }
