@@ -12,7 +12,7 @@ pose = mp_pose.Pose(static_image_mode=True, min_detection_confidence=0.5)
 LOWER = np.array([0, 40, 70], dtype=np.uint8)
 UPPER = np.array([25, 170, 255], dtype=np.uint8)
 
-SKIN_RATIO_THRESHOLD = 0.30
+SKIN_RATIO_THRESHOLD = 0.15
 BLOCK_THRESHOLD = 0.70
 
 SAFE_RESULT = {
