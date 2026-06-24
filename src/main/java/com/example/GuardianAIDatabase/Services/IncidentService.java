@@ -75,11 +75,12 @@ public class IncidentService {
 
     private String formatAction(ActionTaken action) {
         if (action == null) return "Unknown";
-        return switch (action) {
-            case BLOCKED -> "Blocked";
-            case FLAGGED -> "Flagged";
-            case ALLOWED -> "Allowed";
-            case BLUR    -> "Screen Blurred";
-        };
+        switch (action) {
+            case BLOCKED: return "Blocked";
+            case FLAGGED: return "Flagged";
+            case BLUR:    return "Screen Blurred";
+            case ALLOWED:
+            default:      return "Allowed";
+        }
     }
 }
