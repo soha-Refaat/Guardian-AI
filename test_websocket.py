@@ -1,7 +1,5 @@
 """
-Simple test client for the GuardianAI Detection WebSocket.
-Sends a real image file as a binary WebSocket frame and prints the reply.
-
+Test client for GuardianAI Detection WebSocket on Railway.
 Usage:
     pip install websocket-client
     python test_websocket.py path/to/image.jpg
@@ -9,6 +7,8 @@ Usage:
 
 import sys
 import websocket
+
+WS_URL = "wss://nudity-detection-production.up.railway.app/ws/detection?deviceId=test&token=test"
 
 def main():
     if len(sys.argv) < 2:
@@ -20,19 +20,18 @@ def main():
     with open(image_path, "rb") as f:
         frame_bytes = f.read()
 
-    print(f"Loaded {len(frame_bytes)} bytes from {image_path}")
+    print(f"Image loaded: {len(frame_bytes)} bytes")
+    print(f"Connecting to Railway: {WS_URL}")
 
-    ws_url = "ws://localhost:8080/ws/detection?deviceId=test-device-1&token=test-token"
-    print(f"Connecting to {ws_url} ...")
-
-    ws = websocket.create_connection(ws_url)
+    ws = websocket.create_connection(WS_URL, sslopt={"cert_reqs": 0})
     print("Connected!")
 
     ws.send_binary(frame_bytes)
     print("Frame sent, waiting for reply...")
 
     response = ws.recv()
-    print("Reply:", response)
+    print("Reply from Python model:")
+    print(response)
 
     ws.close()
 
