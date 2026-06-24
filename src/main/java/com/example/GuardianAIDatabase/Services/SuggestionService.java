@@ -48,4 +48,11 @@ public class SuggestionService {
     public void removeInterest(String interestId) {
         childInterestRepository.deleteById(interestId);
     }
+
+    public void deleteSuggestion(String suggestionId) {
+        if (!defaultSuggestionRepository.existsById(suggestionId)) {
+            throw new RuntimeException("Suggestion not found");
+        }
+        defaultSuggestionRepository.deleteById(suggestionId);
+    }
 }

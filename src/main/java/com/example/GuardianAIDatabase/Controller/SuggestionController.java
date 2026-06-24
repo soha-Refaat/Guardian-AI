@@ -42,4 +42,10 @@ public class SuggestionController {
         suggestionService.removeInterest(interestId);
         return ResponseEntity.noContent().build();
     }
+    // حذف suggestion card
+    @DeleteMapping("/api/suggestions/{suggestionId}")
+    public ResponseEntity<Void> deleteSuggestion(@PathVariable String suggestionId) {
+        suggestionService.deleteSuggestion(suggestionId);
+        return ResponseEntity.noContent().build();
+    }
 }
