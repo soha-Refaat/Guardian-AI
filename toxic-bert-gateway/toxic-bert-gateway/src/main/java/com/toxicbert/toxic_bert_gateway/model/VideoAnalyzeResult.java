@@ -1,18 +1,13 @@
 package com.toxicbert.toxic_bert_gateway.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
 import java.util.List;
 import java.util.Map;
 
-@Data @Builder @AllArgsConstructor @NoArgsConstructor
 public class VideoAnalyzeResult {
 
-    // Whisper
     private String transcript;
     private List<TranscriptChunk> chunks;
-
-    // toxic-bert
     private Map<String, Double> scores;
 
     @JsonProperty("is_toxic")
@@ -24,23 +19,41 @@ public class VideoAnalyzeResult {
     @JsonProperty("max_score")
     private double maxScore;
 
-    // ترجمة
-    @JsonProperty("original_text")
-    private String originalText;
-
     @JsonProperty("translated_text")
     private String translatedText;
 
     @JsonProperty("was_translated")
     private boolean wasTranslated;
 
-    // أوقات التنفيذ
     @JsonProperty("whisper_ms")
     private double whisperMs;
 
-    @JsonProperty("toxicity_ms")
-    private double toxicityMs;
+    public VideoAnalyzeResult() {}
 
-    @JsonProperty("total_ms")
-    private double totalMs;
+    public String getTranscript() { return transcript; }
+    public void setTranscript(String transcript) { this.transcript = transcript; }
+
+    public List<TranscriptChunk> getChunks() { return chunks; }
+    public void setChunks(List<TranscriptChunk> chunks) { this.chunks = chunks; }
+
+    public Map<String, Double> getScores() { return scores; }
+    public void setScores(Map<String, Double> scores) { this.scores = scores; }
+
+    public boolean isToxic() { return isToxic; }
+    public void setToxic(boolean toxic) { isToxic = toxic; }
+
+    public String getMaxLabel() { return maxLabel; }
+    public void setMaxLabel(String maxLabel) { this.maxLabel = maxLabel; }
+
+    public double getMaxScore() { return maxScore; }
+    public void setMaxScore(double maxScore) { this.maxScore = maxScore; }
+
+    public String getTranslatedText() { return translatedText; }
+    public void setTranslatedText(String translatedText) { this.translatedText = translatedText; }
+
+    public boolean isWasTranslated() { return wasTranslated; }
+    public void setWasTranslated(boolean wasTranslated) { this.wasTranslated = wasTranslated; }
+
+    public double getWhisperMs() { return whisperMs; }
+    public void setWhisperMs(double whisperMs) { this.whisperMs = whisperMs; }
 }
