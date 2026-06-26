@@ -7,7 +7,6 @@ import os
 import sys
 import subprocess
 import tempfile
-import wave
 import numpy as np
 from transformers import (
     AutoTokenizer,
@@ -18,13 +17,10 @@ from transformers import (
     pipeline
 )
 
-os.environ["HF_HOME"] = r"D:\huggingface_cache"
+# ✅ Linux-compatible cache path (Railway)
+os.environ["HF_HOME"] = "/tmp/huggingface_cache"
 
-if hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8")
-
-FFMPEG_PATH = r"D:\ffmpeg\bin"
-os.environ["PATH"] += f";{FFMPEG_PATH}"
+# ✅ Removed Windows-specific FFMPEG path (ffmpeg installed via apt in Dockerfile)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -32,11 +28,10 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 CORS(app)
 app.config["MAX_CONTENT_LENGTH"] = 200 * 1024 * 1024
-# ✅ زيادة الـ Timeout
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 MODEL_ID = "unitary/toxic-bert"
-LABELS = ["toxicity","severe_toxicity","obscene","threat","insult","identity_attack"]
+LABELS = ["toxicity", "severe_toxicity", "obscene", "threat", "insult", "identity_attack"]
 
 model = None
 tokenizer = None
@@ -57,7 +52,7 @@ def load_model():
     translator_model = AutoModelForSeq2SeqLM.from_pretrained("Helsinki-NLP/opus-mt-ar-en")
     translator_model.eval()
 
-    logger.info("Core models loaded")
+    logger.info("Core models loaded successfully")
 
 
 def is_arabic(text):
@@ -87,7 +82,6 @@ def infer(texts, threshold=0.5):
     for text, row in zip(texts, probs):
         scores = {l: float(v) for l, v in zip(LABELS, row)}
         max_label = max(scores, key=scores.get)
-
         results.append({
             "text": text,
             "scores": scores,
@@ -100,8 +94,13 @@ def infer(texts, threshold=0.5):
 
 
 def extract_audio(video_path, audio_path):
-    cmd = ["ffmpeg","-y","-i",video_path,"-vn","-ar","16000","-ac","1","-acodec","pcm_s16le",audio_path]
+    cmd = ["ffmpeg", "-y", "-i", video_path, "-vn", "-ar", "16000",
+           "-ac", "1", "-acodec", "pcm_s16le", audio_path]
     subprocess.run(cmd, capture_output=True)
+
+
+# ✅ Load models at startup (required for gunicorn)
+load_model()
 
 
 # =========================
@@ -126,7 +125,6 @@ def analyze():
     t0 = time.perf_counter()
 
     res = infer([text_en], threshold)[0]
-
     res.update({
         "original_text": text,
         "translated_text": text_en,
@@ -144,7 +142,6 @@ def analyze_batch():
     threshold = float(body.get("threshold", 0.5))
 
     processed, meta = [], []
-
     for t in texts:
         t_en, tr = preprocess_text(t)
         processed.append(t_en)
@@ -155,7 +152,6 @@ def analyze_batch():
         })
 
     results = infer(processed, threshold)
-
     for i in range(len(results)):
         results[i].update(meta[i])
 
@@ -181,17 +177,13 @@ def analyze_video():
         extract_audio(video_path, audio_path)
 
         global whisper_pipe
-
         if whisper_pipe is None:
             logger.info("Loading Whisper on demand...")
-
             whisper_model = AutoModelForSpeechSeq2Seq.from_pretrained(
                 "openai/whisper-small",
                 torch_dtype=torch.float32
             ).to("cpu")
-
             processor = AutoProcessor.from_pretrained("openai/whisper-small")
-
             whisper_pipe = pipeline(
                 "automatic-speech-recognition",
                 model=whisper_model,
@@ -201,7 +193,6 @@ def analyze_video():
             )
 
         t0 = time.perf_counter()
-
         asr = whisper_pipe(
             audio_path,
             return_timestamps=True,
@@ -211,18 +202,15 @@ def analyze_video():
                 "num_beams": 1
             }
         )
-
         whisper_ms = round((time.perf_counter() - t0) * 1000, 2)
 
         transcript = asr["text"]
         chunks = asr.get("chunks", [])
-
         processed_chunks = []
 
         for c in chunks:
             text_en, tr = preprocess_text(c["text"])
             r = infer([text_en], threshold)[0]
-
             processed_chunks.append({
                 "start": c["timestamp"][0],
                 "end": c["timestamp"][1],
@@ -254,57 +242,49 @@ def analyze_video():
     })
 
 
-# =========================
-# ✅ ENDPOINT الصوتي (معدل)
-# =========================
 @app.route("/analyze/audio-chunk", methods=["POST"])
 def analyze_audio_chunk():
     try:
         pcm_bytes = request.data
-        
+
         if not pcm_bytes:
             return jsonify({"error": "empty audio"}), 400
-        
+
         if len(pcm_bytes) < 32000:
             return jsonify({"error": "audio too small (min 32000 bytes)"}), 400
-            
+
         logger.info(f"Received audio chunk: {len(pcm_bytes)} bytes")
-        
-        # ✅ استخدام ffmpeg بدلاً من wave مباشرة
+
         with tempfile.NamedTemporaryFile(suffix=".raw", delete=False) as tmp:
             raw_path = tmp.name
             tmp.write(pcm_bytes)
-        
+
         wav_path = raw_path + ".wav"
-        
+
         cmd = [
             "ffmpeg", "-y",
-            "-f", "s16le",        # 16-bit signed little-endian PCM
-            "-ar", "16000",       # sample rate
-            "-ac", "1",           # mono
-            "-i", raw_path,       # input
-            wav_path              # output WAV
+            "-f", "s16le",
+            "-ar", "16000",
+            "-ac", "1",
+            "-i", raw_path,
+            wav_path
         ]
-        
+
         result = subprocess.run(cmd, capture_output=True)
         os.remove(raw_path)
-        
+
         if result.returncode != 0:
             logger.error(f"FFmpeg error: {result.stderr.decode()}")
             return jsonify({"error": "invalid audio format"}), 400
-        
+
         global whisper_pipe
-        
         if whisper_pipe is None:
             logger.info("Loading Whisper on demand...")
-            
             whisper_model = AutoModelForSpeechSeq2Seq.from_pretrained(
                 "openai/whisper-small",
                 torch_dtype=torch.float32
             ).to("cpu")
-            
             processor = AutoProcessor.from_pretrained("openai/whisper-small")
-            
             whisper_pipe = pipeline(
                 "automatic-speech-recognition",
                 model=whisper_model,
@@ -312,7 +292,7 @@ def analyze_audio_chunk():
                 feature_extractor=processor.feature_extractor,
                 device="cpu"
             )
-        
+
         result = whisper_pipe(
             wav_path,
             generate_kwargs={
@@ -321,10 +301,10 @@ def analyze_audio_chunk():
                 "num_beams": 1
             }
         )
-        
+
         transcript = result["text"].strip()
         os.remove(wav_path)
-        
+
         if not transcript:
             return jsonify({
                 "transcript": "",
@@ -337,10 +317,10 @@ def analyze_audio_chunk():
                 "category": "NONE",
                 "confidence": 0.0
             })
-        
+
         text_en, was_translated = preprocess_text(transcript)
         toxic_result = infer([text_en], threshold=0.5)[0]
-        
+
         response = {
             "transcript": transcript,
             "translated_text": text_en,
@@ -352,17 +332,14 @@ def analyze_audio_chunk():
             "category": toxic_result["max_label"] if toxic_result["is_toxic"] else "NONE",
             "confidence": toxic_result["max_score"]
         }
-        
+
         logger.info(f"Audio chunk processed: transcript='{transcript[:50]}...', toxic={response['is_toxic']}")
         return jsonify(response)
-        
+
     except Exception as e:
         logger.error(f"Audio chunk error: {e}", exc_info=True)
         return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":
-    import multiprocessing
-    multiprocessing.freeze_support()
-    load_model()
-    app.run(host="0.0.0.0", port=5003, debug=True, threaded=True)
+    app.run(host="0.0.0.0", port=5003, debug=False, threaded=True)
