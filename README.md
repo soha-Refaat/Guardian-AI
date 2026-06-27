@@ -30,36 +30,40 @@ Parent App (Flutter)
         │
         │ REST API (HTTPS)
         ▼
-┌─────────────────────────────┐
-│  GuardianAI Database Service │  ← Spring Boot 4 · MySQL · JWT
-│  guardian-ai-production       │
-│  .up.railway.app             │
-└──────────────┬──────────────┘
-               │ Internal REST
-        ┌──────┴───────┐
-        │              │
-        ▼              ▼
-Child App (Android)    Parent App
-        │
-        │ WebSocket (wss://)
-        ▼
-┌──────────────────────────────┐
-│  Nudity Detection Service     │  ← Spring Boot · WebSocket
-│  nudity-detection-production  │
-│  .up.railway.app              │
-└──────────────┬───────────────┘
-               │ HTTP (internal)
-               ▼
-┌──────────────────────────────┐
-│  Python AI Services           │
-│  ├── Nudity (MediaPipe)       │  port 5000
-│  ├── Violence (YOLOv8)        │  port 5005
-│  ├── Unethical (ToxicBERT)    │  port 5003
-│  └── Chatbot (Gemini RAG)     │  port 8000
-└──────────────────────────────┘
-               │
-               ▼
-         MySQL (Railway)
+┌─────────────────────────────────────────────┐
+│       GuardianAI Database Service           │
+│      Spring Boot 4 · MySQL · JWT            │
+│   guardian-ai-production.up.railway.app     │
+└─────────────────────┬───────────────────────┘
+                      │ Internal REST
+        ┌─────────────┴─────────────┐
+        │                           │
+        ▼                           ▼
+ Parent App                   Child App (Android)
+                                    │
+                                    │ WebSocket (wss://)
+                                    ▼
+      ┌──────────────────────────────────────────────────────────┐
+      │             Spring Boot Detection Gateways               │
+      ├──────────────────────────────────────────────────────────┤
+      │ Nudity Detection Gateway     (/ws/detection)             │
+      │ Violence Detection Gateway   (/ws/violence)              │
+      │ Unethical Speech Gateway     (/ws/unethical)             │
+      └───────────────┬───────────────────┬──────────────────────┘
+                      │                   │
+              Internal HTTP        Internal HTTP
+                      │                   │
+      ┌───────────────▼───────────────────▼──────────────────────┐
+      │                 Python AI Services                       │
+      ├──────────────────────────────────────────────────────────┤
+      │ Nudity AI      (MediaPipe + OpenCV)          Port 5000   │
+      │ Violence AI    (YOLOv8)                      Port 5005   │
+      │ Unethical AI   (ToxicBERT + Whisper)         Port 5003   │
+      │ Chatbot        (Gemini RAG)                  Port 8000   │
+      └──────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+                     MySQL (Railway)
 ```
 
 ---
@@ -70,59 +74,69 @@ Child App (Android)    Parent App
 Guardian-AI/
 │
 ├── backend branch
-│   └── GuardianAIDatabase/           ← Spring Boot REST API + JWT
+│   └── GuardianAIDatabase/                 ← Spring Boot REST API + JWT
 │       ├── src/main/java/
-│       │   ├── Entity/               ← JPA Entities
-│       │   ├── Repository/           ← Spring Data JPA
-│       │   ├── Services/             ← Business Logic
-│       │   ├── Controller/           ← REST Controllers
-│       │   ├── Component/            ← JWT Filter
-│       │   ├── Config/               ← Security + CORS
-│       │   └── Dto/                  ← Request/Response DTOs
+│       │   ├── Entity/                     ← JPA Entities
+│       │   ├── Repository/                 ← Spring Data JPA
+│       │   ├── Services/                   ← Business Logic
+│       │   ├── Controller/                 ← REST Controllers
+│       │   ├── Component/                  ← JWT Filter
+│       │   ├── Config/                     ← Security + CORS
+│       │   └── Dto/                        ← Request/Response DTOs
 │       ├── src/main/resources/
 │       │   └── application.properties
 │       └── Dockerfile
 │
 └── main branch
-    ├── Nudity_Detection_Service/     ← Spring Boot WebSocket Gateway
-    │   ├── src/
-    │   ├── python-service/           ← FastAPI (MediaPipe skin detection)
+    ├── Nudity_Detection_Service/
+    │   ├── src/                            ← Spring Boot WebSocket Gateway
+    │   ├── python-service/                 ← FastAPI (MediaPipe skin detection)
     │   └── Dockerfile
     │
-    ├── Violence_detection_service/   ← Flask (YOLOv8 violence detection)
-    │   ├── violence_app.py
+    ├── Violence_Detection_Service/
+    │   ├── src/                            ← Spring Boot WebSocket Gateway
+    │   └── Dockerfile
+    │
+    ├── violence-python-service/
+    │   ├── violence_app.py                 ← YOLOv8 Detection Service
     │   ├── yolo_small_weights.pt
+    │   ├── requirements.txt
     │   └── Dockerfile
     │
-    ├── UnEthical_Service/            ← Flask (ToxicBERT + Whisper)
-    │   ├── python_service/
-    │   │   ├── NonEthical_service.py
-    │   │   ├── requirements.txt
-    │   │   └── Dockerfile
+    ├── UnEthical_Service/
+    │   ├── src/                            ← Spring Boot WebSocket Gateway
+    │   └── Dockerfile
     │
-    └── chatbot-service/              ← FastAPI (Gemini RAG Chatbot)
-        ├── chatbot_main.py
-        ├── GuardianAI_Features.md    ← Knowledge base
+    ├── unethical-python-service/
+    │   ├── NonEthical_service.py           ← ToxicBERT + Whisper Service
+    │   ├── requirements.txt
+    │   └── Dockerfile
+    │
+    └── chatbot-service/
+        ├── chatbot_main.py                 ← FastAPI (Gemini RAG Chatbot)
+        ├── GuardianAI_Features.md          ← Knowledge Base
         ├── requirements.txt
         └── Dockerfile
 ```
 
----
+
 
 ## Services Overview
 
 | Service | Technology | Branch | Port | Railway URL |
 |---|---|---|---|---|
-| Database API | Spring Boot 4 + MySQL | `backend` | 8080 | `guardian-ai-production-21b3.up.railway.app` |
-| Nudity Detection | Spring Boot + WebSocket | `main` | 8080 | `nudity-detection-production.up.railway.app` |
+| Database API | Spring Boot 4 + MySQL + JWT | `backend` | 8080 | `guardian-ai-production-21b3.up.railway.app` |
+| Nudity Detection Gateway | Spring Boot + WebSocket | `main` | 8080 | `nudity-detection-production.up.railway.app` |
 | Nudity AI Model | FastAPI + MediaPipe | `main` | 5000 | internal only |
-| Violence Detection | Flask + YOLOv8 | `main` | 5005 | `unethical-detection-production.up.railway.app` |
-| Unethical Speech | Flask + ToxicBERT + Whisper | `main` | 5003 | internal only |
+| Violence Detection Gateway | Spring Boot + WebSocket | `main` | 8080 | `violence-detection-production.up.railway.app` |
+| Violence AI Model | Flask + YOLOv8 | `main` | 5005 | internal only |
+| Unethical Speech Gateway | Spring Boot + WebSocket | `main` | 8080 | `unethical-detection-production.up.railway.app` |
+| Unethical Speech AI Model | Flask + ToxicBERT + Whisper | `main` | 5003 | internal only |
 | Chatbot | FastAPI + Gemini RAG | `main` | 8000 | internal only |
 | MySQL | Railway MySQL 9.4 | — | 3306 | internal only |
 
----
 
+---
 ## 1. GuardianAI Database Service (`backend` branch)
 
 The core REST API. Handles all data persistence, authentication, and business logic.
@@ -198,83 +212,123 @@ wss://nudity-detection-production.up.railway.app/ws/detection
 
 ## 3. Violence Detection Service (`main` branch)
 
-Flask API using **YOLOv8** custom-trained model for violence detection in images and videos.
+A **Spring Boot WebSocket gateway** that receives live video frames from the Child App, forwards them to the internal **YOLOv8 AI service**, and instantly returns violence detection results. When violent content is detected, the service stores the detection results in the GuardianAI Database and generates alerts for the parent.
 
 ### Tech Stack
-- **Flask 3.0.3**
-- **Ultralytics YOLOv8** (`yolo_small_weights.pt`)
-- **OpenCV**
-- **Gunicorn**
 
-### Endpoints
+* **Spring Boot 4.0.6** · Java 21
+* **Spring WebSocket** (binary frame streaming)
+* **Spring WebFlux (WebClient)** (communication with Python AI service)
+* **Python Flask API**
+* **Ultralytics YOLOv8** (`yolo_small_weights.pt`)
+* **OpenCV**
+* **Gunicorn**
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/health` | Health check |
-| POST | `/predict` | Analyze single image (base64) |
-| POST | `/predict-video` | Analyze full video file |
-| POST | `/predict-frame` | Analyze raw frame bytes (WebSocket flow) |
+### How it Works
 
-### `/predict` Request
-```json
-{
-  "image": "base64_encoded_image_string"
-}
-```
+Child App
+  → opens WebSocket connection
+  → streams JPEG frames as binary messages
+  → Spring Boot forwards each frame to the Python YOLOv8 service
+  → Python analyzes the frame
+  → Spring Boot returns the detection result instantly
+  → If violence is detected:
+        • ContentLog is created
+        • AiDetection is saved
+        • Alert is sent to the parent
+        
 
-### `/predict-frame` Response
+### WebSocket Connection
+
+wss://violence-detection-production.up.railway.app/ws/violence
+    ?deviceId=<device-id>
+    &token=<auth-token>
+
+### Detection Response
+
 ```json
 {
   "detected": true,
   "category": "VIOLENCE",
   "confidence": 0.91,
+  "action": "BLOCKED",
   "contentType": "IMAGE",
   "boundingBoxes": [
-    { "x": 50, "y": 100, "width": 200, "height": 150 }
+    {
+      "x": 50,
+      "y": 100,
+      "width": 200,
+      "height": 150
+    }
   ]
 }
 ```
+
+### Python AI Model (YOLOv8)
+
+The internal Python service:
+
+* Detects violent actions using a custom-trained **YOLOv8** model.
+* Returns bounding boxes around detected objects.
+* Calculates the confidence score.
+* Exposes an internal HTTP endpoint used by the Spring Boot gateway.
+
+#### Internal Endpoint
+
+| Method | Endpoint         | Description                                             |
+| ------ | ---------------- | ------------------------------------------------------- |
+| POST   | `/predict-frame` | Analyze raw image frame sent by the Spring Boot gateway |
+
 
 ---
 
 ## 4. Unethical Speech Service (`main` branch)
 
-Flask API using **ToxicBERT** for text toxicity detection and **Whisper** for audio transcription. Supports Arabic via Helsinki-NLP translation model.
+A **Spring Boot WebSocket gateway** that receives text and audio data from the Child App, forwards it to the internal **ToxicBERT + Whisper AI service**, and instantly returns moderation results. If toxic or offensive content is detected, the service automatically stores the detection in the GuardianAI Database and generates alerts for the parent.
 
 ### Tech Stack
-- **Flask 3.0.3**
-- **ToxicBERT** (`unitary/toxic-bert`)
-- **Helsinki-NLP/opus-mt-ar-en** (Arabic → English translation)
-- **OpenAI Whisper Small** (audio transcription)
-- **FFmpeg** (audio processing)
 
-### Endpoints
+* **Spring Boot 4.0.6** · Java 21
+* **Spring WebSocket**
+* **Spring WebFlux (WebClient)** (communication with the Python AI service)
+* **Python Flask API**
+* **ToxicBERT** (`unitary/toxic-bert`)
+* **Helsinki-NLP/opus-mt-ar-en** (Arabic → English translation)
+* **OpenAI Whisper Small** (audio transcription)
+* **FFmpeg** (audio processing)
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/health` | Health check |
-| POST | `/analyze` | Analyze single text |
-| POST | `/analyze/batch` | Analyze multiple texts |
-| POST | `/analyze/video` | Transcribe + analyze video audio |
-| POST | `/analyze/audio-chunk` | Analyze raw PCM audio chunk |
+### How it Works
 
-### `/analyze` Request
-```json
-{
-  "text": "أنا أكرهك",
-  "threshold": 0.5
-}
+
+Child App
+  → opens WebSocket connection (once)
+  → streams text messages or audio chunks
+  → Spring Boot forwards each request to the Python AI service
+  → Python analyzes the content
+  → Spring Boot replies to Child App instantly
+  → If detected: saves ContentLog + AiDetection + Alert to DB
+  
+
+### WebSocket Connection
+
+```
+wss://unethical-detection-production.up.railway.app/ws/unethical
+  ?deviceId=<device-id>
+  &token=<auth-token>
 ```
 
-### `/analyze` Response
+### Detection Response
+
 ```json
 {
-  "original_text": "أنا أكرهك",
-  "translated_text": "I hate you",
-  "was_translated": true,
-  "is_toxic": true,
-  "max_label": "toxicity",
-  "max_score": 0.94,
+  "originalText": "أنا أكرهك",
+  "translatedText": "I hate you",
+  "wasTranslated": true,
+  "detected": true,
+  "category": "TOXICITY",
+  "confidence": 0.94,
+  "action": "BLOCKED",
+  "contentType": "TEXT",
   "scores": {
     "toxicity": 0.94,
     "severe_toxicity": 0.12,
@@ -282,20 +336,29 @@ Flask API using **ToxicBERT** for text toxicity detection and **Whisper** for au
     "threat": 0.05,
     "insult": 0.73,
     "identity_attack": 0.03
-  },
-  "latency_ms": 142.5
+  }
 }
 ```
 
+### Python AI Model (ToxicBERT + Whisper)
+
+* Detects toxic and offensive speech using **ToxicBERT**
+* Transcribes audio using **OpenAI Whisper**
+* Translates Arabic text using **Helsinki-NLP**
+* Returns toxicity scores and confidence values
+* Endpoint: `POST /analyze` (text or audio request)
+
 ### Toxicity Labels
-| Label | Description |
-|---|---|
-| `toxicity` | General toxic content |
-| `severe_toxicity` | Highly toxic / harmful |
-| `obscene` | Obscene language |
-| `threat` | Threatening language |
-| `insult` | Insulting content |
-| `identity_attack` | Hate speech targeting identity |
+
+| Label             | Description                      |
+| ----------------- | -------------------------------- |
+| `toxicity`        | General toxic content            |
+| `severe_toxicity` | Highly toxic or harmful language |
+| `obscene`         | Obscene language                 |
+| `threat`          | Threatening language             |
+| `insult`          | Insulting content                |
+| `identity_attack` | Hate speech targeting identity   |
+
 
 ---
 
@@ -644,16 +707,17 @@ Response item:
 ## Deployment on Railway
 
 ### Services on Railway
-
 ```
 GuardianAI Project (Railway)
-├── guardian-ai-db          ← backend branch, Root: /
-├── nudity-detection        ← main branch, Root: Nudity_Detection_Service
-├── python-nudity           ← main branch, Root: Nudity_Detection_Service/python-service
-├── violence-detection      ← main branch, Root: Violence_detection_service
-├── unethical-service       ← main branch, Root: UnEthical_Service/python_service
-├── chatbot-service         ← main branch, Root: chatbot-service
-└── MySQL                   ← Railway managed MySQL 9.4
+├── guardian-ai-db           ← backend branch, Root: /
+├── nudity-detection         ← main branch, Root: Nudity_Detection_Service
+├── python-nudity            ← main branch, Root: Nudity_Detection_Service/python-service
+├── violence-detection       ← main branch, Root: Violence_Detection_Service
+├── python-violence          ← main branch, Root: violence-python-service
+├── unethical-detection      ← main branch, Root: UnEthical_Service
+├── python-unethical         ← main branch, Root: unethical-python-service
+├── chatbot-service          ← main branch, Root: chatbot-service
+└── MySQL                    ← Railway managed MySQL 9.4
 ```
 
 ### Auto-Deploy
@@ -705,12 +769,14 @@ GEMINI_API_KEY = <your Gemini API key from aistudio.google.com>
 
 | Layer | Technology |
 |---|---|
-| Database API | Spring Boot 4, Spring Security, JWT, JPA, Hibernate 7, Lombok |
-| WebSocket Gateway | Spring Boot 4, Spring WebSocket, WebFlux (WebClient) |
+| Database API | Spring Boot 4, Spring Security, JWT, Spring Data JPA, Hibernate 7, Lombok |
+| Nudity Gateway | Spring Boot 4, Spring WebSocket, Spring WebFlux (WebClient) |
+| Violence Gateway | Spring Boot 4, Spring WebSocket, Spring WebFlux (WebClient) |
+| Unethical Gateway | Spring Boot 4, Spring WebSocket, Spring WebFlux (WebClient) |
 | Nudity AI | FastAPI, MediaPipe, OpenCV, NumPy |
 | Violence AI | Flask, YOLOv8 (Ultralytics), OpenCV |
-| Speech AI | Flask, ToxicBERT, Whisper, Helsinki-NLP, FFmpeg |
+| Unethical AI | Flask, ToxicBERT, Whisper, Helsinki-NLP, FFmpeg |
 | Chatbot | FastAPI, Google Gemini 2.5 Flash, Gemini Embeddings |
 | Database | MySQL 9.4 (Railway managed) |
 | Deployment | Railway (all services) |
-| Mobile | Flutter (Parent App) · Android/Kotlin (Child App) |
+| Mobile | Flutter (Parent App) · Android (Child App) |
